@@ -17,10 +17,10 @@ parte del grupo.
 
 | Nombre completo | Código | Correo institucional |
 |---|---|---|
-| | | |
-| | | |
-| | | |
-| | | |
+|Nicolas Cardona Garcia |2477349 |nicolas.cardona.garcia@correounivalle.edu.co |
+|Santiago Serrano Morales |2477006 |serrano.santiago@correounivalle.edu.co |
+|Laura Sofía Echeverry González |2477067 |echeverry.laura@correounivalle.edu.co |
+|Samuel Estaban Peña Jaramillo |2477399 |	samuel.pena@correounivalle.edu.co |
 
 ## Cómo se entrega
 
