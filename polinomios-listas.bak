@@ -30,8 +30,3 @@
 (define eliminar-termino
   (lambda (polinomio exponente)
     (eopl:error 'eliminar-termino "Sin implementar")))
-
-
-
-
-;;Hola chat
