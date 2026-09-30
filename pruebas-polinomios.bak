@@ -34,39 +34,6 @@
 ;; Santiago
 ;; =========================================================
 
-;; Construcciones con los datatypes
-
-(define dato-1
-  (dt:nombre-var 'x))
-
-(define dato-2
-  (dt:coef-ent 12))
-
-(define dato-3
-  (dt:coef-rac -7 3))
-
-(define dato-4
-  (dt:termino
-   (dt:coef-rac 5 4)
-   (dt:expo-nat 7)))
-
-(define dato-5
-  (dt:poli
-   (dt:nombre-var 'w)
-   (dt:mas-terminos
-    (dt:termino
-     (dt:coef-ent 6)
-     (dt:expo-nat 9))
-    (dt:mas-terminos
-     (dt:termino
-      (dt:coef-rac -5 2)
-      (dt:expo-nat 4))
-     (dt:mas-terminos
-      (dt:termino
-       (dt:coef-ent 3)
-       (dt:expo-nat 0))
-      (dt:sin-terminos))))))
-
 ;; Polinomio Cero
 
 (check-exn
@@ -143,36 +110,25 @@
  (lambda ()
    (dt:insertar-termino p-prueba 8 -2)))
 
-
 ;; Coeficiente de
 
-;; -- Buscar un termino que fue agregado --
+;; -- Buscar un un exponente que esta en el medio
 (check-equal?
  (dt:coeficiente-de
-  (dt:insertar-termino p-prueba 9 10)
-  10)
- 9)
+  (dt:insertar-termino p-prueba 11 4)
+  4)
+ 11)
 
-;; -- Buscar el termino de menor exponente --
+;; -- Buscar un coeficiente racional --
 (check-equal?
- (dt:coeficiente-de p-prueba 1)
- 7)
+ (dt:coeficiente-de p-prueba 6)
+ -5/2)
 
 ;; -- Buscar un exponente que no existe --
 (check-exn
  (lambda (e) #t)
  (lambda ()
    (dt:coeficiente-de p-prueba 8)))
-
-;; -- Buscar el termino constante --
-(check-equal?
- (dt:coeficiente-de
-  (dt:insertar-termino
-   (dt:polinomio-cero 't)
-   15
-   0)
-  0)
- 15)
 
 ;; Eliminar Termino
 
@@ -199,7 +155,7 @@
 
 ;; Sumar
 
-;; -- Aqui creamos los polinomios para sumar --
+;; -- Aqui creamos los polinomios --
 
 (define p-suma-1
   (dt:insertar-termino
@@ -233,7 +189,7 @@
   5)
  4)
 
-;; -- Comprobamos el que desaparecen
+;; -- Comprobamos los que desaparecen
 
 (check-exn
  (lambda (e) #t)

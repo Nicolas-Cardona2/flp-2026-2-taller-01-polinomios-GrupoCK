@@ -1,0 +1,143 @@
+#lang eopl
+;Autores: Santiago Serrano Morales 202477006
+
+;; Taller 1 — Polinomios dispersos.
+;; Parte 3: representación con datatypes.
+;;
+;; Interfaz del TAD. Cada función va comentada con su nombre, su contrato
+;; (entrada -> salida) y su propósito, y ninguna recorre la lista de términos
+;; más de una vez ni la ordena al final.
+;;
+;;   polinomio-cero    : symbol -> polinomio
+;;   insertar-termino  : polinomio x coeficiente x exponente -> polinomio
+;;   coeficiente-de    : polinomio x exponente -> coeficiente
+;;   eliminar-termino  : polinomio x exponente -> polinomio
+;;   sumar             : polinomio x polinomio -> polinomio
+
+;;Datatypes
+
+(define-datatype variable variable?
+  (nombre-var
+   (s symbol?)))
+
+(define-datatype terminos terminos?
+  (sin-terminos)
+  (mas-terminos
+   (term termino?)
+   (resto terminos?)))
+
+(define-datatype termino-tad termino?
+  (termino
+   (coef coeficiente?)
+   (expo exponente?)))
+
+(define-datatype coeficiente coeficiente?
+  (coef-ent
+   (n integer?))
+  (coef-rac
+   (num integer?)
+   (den integer?)))
+
+(define-datatype exponente exponente?
+  (expo-nat
+   (k integer?)))
+
+(define-datatype polinomio polinomio?
+  (poli
+   (var variable?)
+   (terms terminos?)))
+
+;;Funciones
+
+(provide polinomio-cero insertar-termino coeficiente-de eliminar-termino sumar)
+
+(define polinomio-cero
+  (lambda (variable)
+    (poli
+     (nombre-var variable)
+     (sin-terminos))))
+    
+;;Funcion Auxiliar para insertar-termino
+
+(define convertir-coeficiente
+  (lambda (coeficiente)
+    (cond
+      ((integer? coeficiente)
+       (coef-ent coeficiente))
+      (else
+       (coef-rac
+        (numerator coeficiente)
+        (denominator coeficiente))))))
+
+(define sumar-coeficientes
+  (lambda (coef1 coef2)
+    (cases coeficiente coef1
+      (coef-ent (n1)
+        (cases coeficiente coef2
+          (coef-ent (n2)
+            (+ n1 n2))
+          (coef-rac (num den)
+            (+ n1 (/ num den)))))
+
+      (coef-rac (num1 den1)
+        (cases coeficiente coef2
+          (coef-ent (n2)
+            (+ (/ num1 den1) n2))
+          (coef-rac (num2 den2)
+            (+ (/ num1 den1) (/ num2 den2))))))))
+
+;;
+
+
+
+(define insertar-termino
+  (lambda (polinomio coeficiente exponente)
+    (eopl:error 'insertar-termino "Sin implementar")))
+
+(define coeficiente-de
+  (lambda (polinomio exponente)
+    (eopl:error 'coeficiente-de "Sin implementar")))
+
+(define eliminar-termino
+  (lambda (polinomio exponente)
+    (eopl:error 'eliminar-termino "Sin implementar")))
+
+(define sumar
+  (lambda (p q)
+    (eopl:error 'sumar "Sin implementar")))
+
+
+
+;;Pruebas x
+
+(nombre-var 'x)
+(coef-ent 4)
+(expo-nat 5)
+
+(termino
+ (coef-ent 4)
+ (expo-nat 5))
+
+(mas-terminos
+ (termino
+  (coef-ent 4)
+  (expo-nat 5))
+ (sin-terminos))
+
+(poli
+ (nombre-var 'x)
+ (mas-terminos
+  (termino
+   (coef-ent 4)
+   (expo-nat 5))
+  (sin-terminos)))
+
+(polinomio-cero 'x)
+
+(polinomio-cero 'y)
+
+(polinomio-cero 'z)
+
+(convertir-coeficiente 4)
+
+(convertir-coeficiente -3/2)
