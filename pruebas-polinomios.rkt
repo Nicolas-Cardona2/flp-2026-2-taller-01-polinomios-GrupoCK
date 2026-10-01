@@ -19,9 +19,30 @@
 
 ;; =========================================================
 ;; PRUEBAS PARTE 1 — REPRESENTACIÓN CON LISTAS
-;; Compañero 1
+;; Samuel
 ;; =========================================================
 
+;; Construcciones de polinomios
+
+;; Construccion del polinomio nulo 
+(define mi-var (nombre-var 'y))
+(define terms-nulos (sin-terminos))
+(define poli-vacio (poli mi-var terms-nulos))
+
+(define term1 (termino (coef-ent 5) (expo-nat 2)))
+(define poli-un-term (poli (nombre-var 'x) (mas-terminos term1 (sin-terminos))))
+
+(define coef-racional (coef-rac 3 4))
+(define term2 (termino coef-racional (expo-nat 1)))
+(define poli-racional (poli (nombre-var 'z) (mas-terminos term2 (sin-terminos))))
+
+;; Uso de observadores 
+(poli? poli-un-term) ;; Retorna #t
+(nombre-var->s (poli->var poli-un-term)) ;; Retorna el símbolo 'x
+
+(define term-extraido (mas-terminos->term (poli->terms poli-racional)))
+(coef-rac->num (termino->coef term-extraido)) ;; Retorna 3
+(coef-rac->den (termino->coef term-extraido)) ;; Retorna 4
 
 ;; =========================================================
 ;; PRUEBAS PARTE 2 — REPRESENTACIÓN CON PROCEDIMIENTOS
