@@ -1,5 +1,5 @@
 #lang eopl
-;Autores: Santiago Serrano Morales 2477006, Nombre2 Codigo2, Laura Sofía Echeverry González 2477067, Nombre4 Codigo4
+;Autores: Nicolas Cardona Garcia 2477349-3743, Nombre2 Codigo2
 
 ;; Taller 1 — Polinomios dispersos.
 ;; Parte 4: la misma batería de pruebas sobre las tres representaciones.
@@ -17,295 +17,196 @@
 ;;     (listas:insertar-termino (listas:polinomio-cero 'x) 7 0) 0)
 ;;   7)
 
-;; =========================================================
-;; PRUEBAS PARTE 1 — REPRESENTACIÓN CON LISTAS
-;; Samuel
-;; =========================================================
+;; aqui iran los mensajes de error
+(define msg-expo-negativo #rx"xponente debe ser un entero no negativo")
+(define msg-sin-termino #rx"no tiene termino con ese exponente")
+;; cualquier otro error x
+(define cualquier-error #rx"")
 
-;; Construcciones de polinomios
+;;aqui exponentes que se consultan para revisar que un polinomio no tienen mas terminos de los esperados
+(define sondeo '(0 1 2 3 4 5 6 7 8 1000))
 
-;; Construccion del polinomio nulo 
-(define mi-var (nombre-var 'y))
-(define terms-nulos (sin-terminos))
-(define poli-vacio (poli mi-var terms-nulos))
+;;funcion verificar polinomio
 
-(define term1 (termino (coef-ent 5) (expo-nat 2)))
-(define poli-un-term (poli (nombre-var 'x) (mas-terminos term1 (sin-terminos))))
+(define verificar-poli
+  (lambda (coef p esperados)
+    (for-each
+     (lambda (par)
+       (check-equal? (coef p (car par)) (cdr par)))
+     esperados)
+    (for-each
+     (lambda (e)
+       (cond
+         [(assv e esperados) #t]
+         [else (check-exn msg-sin-termino (lambda () (coef p e)))]))
+     sondeo)))
 
-(define coef-racional (coef-rac 3 4))
-(define term2 (termino coef-racional (expo-nat 1)))
-(define poli-racional (poli (nombre-var 'z) (mas-terminos term2 (sin-terminos))))
+;;bateria comun
+(define bateria
+  (lambda (nombre cero ins coef elim)
+    (let ((p (ins (ins  (ins (cero 'x) 7 0) -3/2 2) 4 5)))  ; 4x^5 - 3/2 x^2 + 7
+      (test-case (string-append nombre " construccion con insertar-termino") ;;casos funcionales
+        (verificar-poli coef p '((5 . 4) (2 . -3/2) (0 . 7))))
 
-;; Uso de observadores 
-(poli? poli-un-term) ;; Retorna #t
-(nombre-var->s (poli->var poli-un-term)) ;; Retorna el símbolo 'x
+      (test-case (string-append nombre " el orden de insercion no importa")
+        (let ((q (ins (ins (ins (cero 'x) 4 5) 7 0) -3/2 2))
+              (r (ins (ins (ins (cero 'x) -3/2 2) 4 5) 7 0)))
+          (verificar-poli coef q '((5 . 4) (2 . -3/2) (0 . 7)))
+          (verificar-poli coef r '((5 . 4) (2 . -3/2) (0 . 7)))))
 
-(define term-extraido (mas-terminos->term (poli->terms poli-racional)))
-(coef-rac->num (termino->coef term-extraido)) ;; Retorna 3
-(coef-rac->den (termino->coef term-extraido)) ;; Retorna 4
+      (test-case (string-append nombre " insertar sobre exponente existente suma")
+        (verificar-poli coef (ins p 1 2) '((5 . 4) (2 . -1/2) (0 . 7))))
 
-;; =========================================================
-;; PRUEBAS PARTE 2 — REPRESENTACIÓN CON PROCEDIMIENTOS
-;; Laura
-;; =========================================================
+      (test-case (string-append nombre " suma de racionales que da entero")
+        (verificar-poli coef
+                        (ins (ins (cero 'x) 1/3 4) 2/3 4)
+                        '((4 . 1))))
 
+      (test-case (string-append nombre " coeficientes racionales negativos y enteros")
+        (check-equal? (coef p 2) -3/2)
+        (check-equal? (coef p 5) 4)
+        (check-equal? (coef p 0) 7))
 
-;; =========================================================
-;; PRUEBAS PARTE 3 — REPRESENTACIÓN CON DATATYPES
-;; Santiago
-;; =========================================================
+      (test-case (string-append nombre " exponente muy grande")
+        (verificar-poli coef
+                        (ins (ins (cero 'x) 5 1000) 2 0)
+                        '((1000 . 5) (0 . 2))))
 
-;; Construcciones con los datatypes
+      (test-case (string-append nombre " eliminar-termino")
+        (verificar-poli coef (elim p 2) '((5 . 4) (0 . 7)))
+        (verificar-poli coef (elim p 5) '((2 . -3/2) (0 . 7)))
+        (verificar-poli coef (elim p 0) '((5 . 4) (2 . -3/2))))
 
-(define dato-1
-  (dt:nombre-var 'x))
+      (test-case (string-append nombre " eliminar no modifica el original")
+        (elim p 2)
+        (verificar-poli coef p '((5 . 4) (2 . -3/2) (0 . 7))))
 
-(define dato-2
-  (dt:coef-ent 12))
+      (test-case (string-append nombre " eliminar todos los terminos deja el nulo")
+        (verificar-poli coef (elim (elim (elim p 5) 2) 0) '()))
 
-(define dato-3
-  (dt:coef-rac -7 3))
+      ;; polinomio nulo como caso base
+      (test-case (string-append nombre " nulo - consultar")
+        (check-exn msg-sin-termino (lambda () (coef (cero 'x) 0)))
+        (check-exn msg-sin-termino (lambda () (coef (cero 'x) 3))))
 
-(define dato-4
-  (dt:termino
-   (dt:coef-rac 5 4)
-   (dt:expo-nat 7)))
+      (test-case (string-append nombre " nulo - eliminar")
+        (check-exn msg-sin-termino (lambda () (elim (cero 'x) 0)))
+        (check-exn msg-sin-termino (lambda () (elim (cero 'y) 4))))
 
-(define dato-5
-  (dt:poli
-   (dt:nombre-var 'w)
-   (dt:mas-terminos
-    (dt:termino
-     (dt:coef-ent 6)
-     (dt:expo-nat 9))
-    (dt:mas-terminos
-     (dt:termino
-      (dt:coef-rac -5 2)
-      (dt:expo-nat 4))
-     (dt:mas-terminos
-      (dt:termino
-       (dt:coef-ent 3)
-       (dt:expo-nat 0))
-      (dt:sin-terminos))))))
+      (test-case (string-append nombre " nulo - insertar")
+        (verificar-poli coef (ins (cero 'x) 7 0) '((0 . 7)))
+        (verificar-poli coef (ins (cero 'x) -3/2 2) '((2 . -3/2))))
 
-;; Polinomio Cero
+      ;; cancelacion
+      (test-case (string-append nombre " la suma cero elimina el termino")
+        (verificar-poli coef (ins p 3/2 2) '((5 . 4) (0 . 7))))
 
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:polinomio-cero 'm)
-    4)))
+      (test-case (string-append nombre " cancelar el unico termino deja el nulo")
+        (verificar-poli coef (ins (ins (cero 'x) 5 3) -5 3) '()))
 
-(check-equal?
- (dt:coeficiente-de
-  (dt:insertar-termino
-   (dt:polinomio-cero 'm)
-   13
-   4)
-  4)
- 13)
+      (test-case (string-append nombre " cancelar el termino de mayor grado")
+        (verificar-poli coef (ins p -4 5) '((2 . -3/2) (0 . 7))))
 
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:insertar-termino
-     (dt:polinomio-cero 'q)
-     -7/3
-     5)
-    2)))
+      ;;insercion con coeficioente cero
+      (test-case (string-append nombre " insertar 0 con exponente nuevo no altera")
+        (verificar-poli coef (ins p 0 3) '((5 . 4) (2 . -3/2) (0 . 7))))
 
+      (test-case (string-append nombre " insertar 0 con exponente existente no altera")
+        (verificar-poli coef (ins p 0 2) '((5 . 4) (2 . -3/2) (0 . 7))))
 
-;; Insertar Termino
+      (test-case (string-append nombre " insertar 0 en el nulo sigue siendo nulo")
+        (verificar-poli coef (ins (cero 'x) 0 4) '()))
 
-(define p-prueba
-  (dt:insertar-termino
-   (dt:insertar-termino
-    (dt:polinomio-cero 'r)
-    7
-    1)
-   -5/2
-   6))
+      ;; errores
+      (test-case (string-append nombre " error - exponente negativo")
+        (check-exn msg-expo-negativo (lambda () (ins p 5 -1)))
+        (check-exn msg-expo-negativo (lambda () (ins (cero 'x) 1 -10))))
 
-;; -- Insertar un exponente en medio --
-(check-equal?
- (dt:coeficiente-de
-  (dt:insertar-termino p-prueba 11 4)
-  4)
- 11)
+      (test-case (string-append nombre " error - coeficiente no exacto")
+        (check-exn cualquier-error (lambda () (ins p 1.5 2)))
+        (check-exn cualquier-error (lambda () (ins (cero 'x) 2.0 0))))
 
-;; -- Insertar sobre un exponente que ya existe --
-(check-equal?
- (dt:coeficiente-de
-  (dt:insertar-termino p-prueba 3/2 6)
-  6)
- -1)
+      (test-case (string-append nombre " error - coeficiente-de sin ese exponente")
+        (check-exn msg-sin-termino (lambda () (coef p 3)))
+        (check-exn msg-sin-termino (lambda () (coef p 6)))
+        (check-exn msg-sin-termino (lambda () (coef p 1))))
 
-;; -- Insertar Coeficiente cero --
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:insertar-termino p-prueba 0 9)
-    9)))
+      (test-case (string-append nombre " error - eliminar-termino sin ese exponente")
+        (check-exn msg-sin-termino (lambda () (elim p 3)))
+        (check-exn msg-sin-termino (lambda () (elim p 100))))
 
-;; -- Si los coeficientes se cancelan, el termino desaparece --
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:insertar-termino p-prueba 5/2 6)
-    6)))
+      (test-case (string-append nombre " error - eliminar dos veces el mismo exponente")
+        (check-exn msg-sin-termino (lambda () (elim (elim p 2) 2)))))))
 
-;; -- No se permite un exponente negativo --
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:insertar-termino p-prueba 8 -2)))
+;;aqui la misma bateria sobre las 3 representaciones
 
+(bateria "listas"
+         listas:polinomio-cero listas:insertar-termino
+         listas:coeficiente-de listas:eliminar-termino)
 
-;; Coeficiente de
+(bateria "procedimientos"
+         procs:polinomio-cero procs:insertar-termino
+         procs:coeficiente-de procs:eliminar-termino)
 
-;; -- Buscar un termino que fue agregado --
-(check-equal?
- (dt:coeficiente-de
-  (dt:insertar-termino p-prueba 9 10)
-  10)
- 9)
+(bateria "datatypes"
+         dt:polinomio-cero dt:insertar-termino
+         dt:coeficiente-de dt:eliminar-termino)
 
-;; -- Buscar el termino de menor exponente --
-(check-equal?
- (dt:coeficiente-de p-prueba 1)
- 7)
+;;pruebas exclusivas del datatype (sumasr)
+(define construir-dt
+  (lambda (var pares)
+    (cond
+      [(null? pares) (dt:polinomio-cero var)]
+      [else (dt:insertar-termino (construir-dt var (cdr pares))
+                                 (cdr (car pares))
+                                 (car (car pares)))])))
 
-;; -- Buscar un exponente que no existe --
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de p-prueba 8)))
+(define p-dt (construir-dt 'x '((5 . 4) (2 . -3/2) (0 . 7))))   ; 4x^5 - 3/2 x^2 + 7
+(define q-dt (construir-dt 'x '((5 . -4) (2 . 1/2) (1 . 2))))   ; -4x^5 + 1/2 x^2 + 2x
 
-;; -- Buscar el termino constante --
-(check-equal?
- (dt:coeficiente-de
-  (dt:insertar-termino
-   (dt:polinomio-cero 't)
-   15
-   0)
-  0)
- 15)
+(test-case "datatypes sumar"
+  ;; Resultado: -x^2 + 2x + 7
+  (verificar-poli dt:coeficiente-de (dt:sumar p-dt q-dt)
+                  '((2 . -1) (1 . 2) (0 . 7))))
 
-;; Eliminar Termino
+(test-case "datatypes sumar es conmutativa"
+  (verificar-poli dt:coeficiente-de (dt:sumar q-dt p-dt)
+                  '((2 . -1) (1 . 2) (0 . 7))))
 
-;; --Eliminar un termino y comprobar que los demas siguen --
-(check-equal?
- (dt:coeficiente-de
-  (dt:eliminar-termino p-prueba 6)
-  1)
- 7)
+(test-case "datatypes sumar - cancelacion total da el polinomio nulo"
+  (let ((menos-p (construir-dt 'x '((5 . -4) (2 . 3/2) (0 . -7)))))
+    (verificar-poli dt:coeficiente-de (dt:sumar p-dt menos-p) '())))
 
-;; -- Eliminar el termino de menor exponente --
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:eliminar-termino p-prueba 1)
-    1)))
+(test-case "datatypes sumar - el nulo es neutro"
+  (verificar-poli dt:coeficiente-de (dt:sumar p-dt (dt:polinomio-cero 'x))
+                  '((5 . 4) (2 . -3/2) (0 . 7)))
+  (verificar-poli dt:coeficiente-de (dt:sumar (dt:polinomio-cero 'x) p-dt)
+                  '((5 . 4) (2 . -3/2) (0 . 7))))
 
-;; -- Eliminar un exponente que no existe --
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:eliminar-termino p-prueba 10)))
+(test-case "datatypes sumar - nulo + nulo"
+  (verificar-poli dt:coeficiente-de
+                  (dt:sumar (dt:polinomio-cero 'x) (dt:polinomio-cero 'x))
+                  '()))
 
-;; Sumar
+(test-case "datatypes sumar - exponentes disjuntos se intercalan en orden"
+  (verificar-poli dt:coeficiente-de
+                  (dt:sumar (construir-dt 'x '((6 . 1) (2 . 1)))
+                            (construir-dt 'x '((4 . 3) (0 . 5))))
+                  '((6 . 1) (4 . 3) (2 . 1) (0 . 5))))
 
-;; -- Aqui creamos los polinomios para sumar --
+(test-case "datatypes sumar - racionales que se suman a entero"
+  (verificar-poli dt:coeficiente-de
+                  (dt:sumar (construir-dt 'x '((3 . 1/2)))
+                            (construir-dt 'x '((3 . 1/2))))
+                  '((3 . 1))))
 
-(define p-suma-1
-  (dt:insertar-termino
-   (dt:insertar-termino
-    (dt:polinomio-cero 's)
-    7
-    8)
-   -3
-   2))
+(test-case "datatypes sumar - no modifica los operandos"
+  (dt:sumar p-dt q-dt)
+  (verificar-poli dt:coeficiente-de p-dt '((5 . 4) (2 . -3/2) (0 . 7)))
+  (verificar-poli dt:coeficiente-de q-dt '((5 . -4) (2 . 1/2) (1 . 2))))
 
-(define p-suma-2
-  (dt:insertar-termino
-   (dt:insertar-termino
-    (dt:polinomio-cero 's)
-    4
-    5)
-   3
-   2))
-
-;; -- Comprobamos los terminos que permanecen --
-
-(check-equal?
- (dt:coeficiente-de
-  (dt:sumar p-suma-1 p-suma-2)
-  8)
- 7)
-
-(check-equal?
- (dt:coeficiente-de
-  (dt:sumar p-suma-1 p-suma-2)
-  5)
- 4)
-
-;; -- Comprobamos el que desaparecen
-
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:sumar p-suma-1 p-suma-2)
-    2)))
-
-;; -- Una suma que se cancela completamente
-
-(define p-cancelar-1
-  (dt:insertar-termino
-   (dt:insertar-termino
-    (dt:polinomio-cero 'v)
-    6
-    9)
-   -4
-   4))
-
-(define p-cancelar-2
-  (dt:insertar-termino
-   (dt:insertar-termino
-    (dt:polinomio-cero 'v)
-    -6
-    9)
-   4
-   4))
-
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:sumar p-cancelar-1 p-cancelar-2)
-    9)))
-
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:coeficiente-de
-    (dt:sumar p-cancelar-1 p-cancelar-2)
-    4)))
-
-;; -- Variables diferentes -- ( Se espera un Error )
-(check-exn
- (lambda (e) #t)
- (lambda ()
-   (dt:sumar
-    (dt:polinomio-cero 'x)
-    (dt:polinomio-cero 'y))))
-
-;; =========================================================
-;; PRUEBAS GENERALES DE LA PARTE 4
-;; Compañero 4
-;; =========================================================
+(test-case "datatypes sumar - error con variables distintas"
+  (check-exn cualquier-error
+             (lambda () (dt:sumar p-dt (construir-dt 'y '((1 . 1))))))
+  (check-exn cualquier-error
+             (lambda () (dt:sumar (dt:polinomio-cero 'x) (dt:polinomio-cero 'y)))))
