@@ -1,5 +1,5 @@
 #lang eopl
-;Autores: Santiago Serrano Morales 2477006, Nombre2 Codigo2, Nombre3 Codigo3, Nombre4 Codigo4
+;Autores: Santiago Serrano Morales 2477006, Nombre2 Codigo2, Laura Sofía Echeverry González 2477067, Nombre4 Codigo4
 
 ;; Taller 1 — Polinomios dispersos.
 ;; Parte 4: la misma batería de pruebas sobre las tres representaciones.
@@ -46,7 +46,7 @@
 
 ;; =========================================================
 ;; PRUEBAS PARTE 2 — REPRESENTACIÓN CON PROCEDIMIENTOS
-;; Compañero 2
+;; Laura
 ;; =========================================================
 
 
