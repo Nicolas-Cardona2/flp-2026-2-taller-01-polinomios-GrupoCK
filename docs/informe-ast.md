@@ -84,7 +84,7 @@ Explicación: el nodo `poli` tiene siempre dos hijos: la variable (`nombre-var`)
 
 ### Ejemplo 2 — dos términos, uno con coeficiente racional
 
-Polinomio: $p_2 = \\dfrac{3}{4}x^5 - 2x$
+Polinomio: $p_2 = \dfrac{3}{4}x^5 - 2x$
 
 Construcción:
 
@@ -155,7 +155,7 @@ Se usan los polinomios $p$ y $q$ del ejemplo de la Parte 3 del enunciado.
 
 Operandos:
 
-$$p = 4x^5 - \\frac{3}{2}x^2 + 7 \\qquad q = -4x^5 + \\frac{1}{2}x^2 + 2x$$
+$$p = 4x^5 - \frac{3}{2}x^2 + 7 \qquad q = -4x^5 + \frac{1}{2}x^2 + 2x$$
 
 Resultado: $p + q = -x^2 + 2x + 7$
 
@@ -211,7 +211,7 @@ Origen de cada nodo:
 
 | Término del resultado | Viene de | Observación |
 | --- | --- | --- |
-| $-x^2$ (coef $-1$, exp $2$) | suma de ambos | $p$ tenía $-\\frac{3}{2}x^2$ y $q$ tenía $\\frac{1}{2}x^2$ en el mismo exponente; `sumar-terminos` combina ambos coeficientes: $-\\frac{3}{2}+\\frac{1}{2}=-1$. |
+| $-x^2$ (coef $-1$, exp $2$) | suma de ambos | $p$ tenía $-\frac{3}{2}x^2$ y $q$ tenía $\frac{1}{2}x^2$ en el mismo exponente; `sumar-terminos` combina ambos coeficientes: $-\frac{3}{2}+\frac{1}{2}=-1$. |
 | $2x$ (coef $2$, exp $1$) | $q$ | $p$ no tiene término con exponente $1$, así que el término de $q$ pasa sin cambios al resultado. |
 | $7$ (coef $7$, exp $0$) | $p$ | $q$ no tiene término con exponente $0$, así que el término de $p$ pasa sin cambios al resultado. |
 
