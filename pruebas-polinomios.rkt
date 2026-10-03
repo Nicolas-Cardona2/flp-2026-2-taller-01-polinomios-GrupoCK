@@ -1,5 +1,5 @@
 #lang eopl
-;Autores: Nicolas Cardona Garcia 2477349-3743, Nombre2 Codigo2
+;Autores: Nicolas Cardona Garcia 2477349-3743
 
 ;; Taller 1 — Polinomios dispersos.
 ;; Parte 4: la misma batería de pruebas sobre las tres representaciones.
@@ -152,7 +152,7 @@
          dt:polinomio-cero dt:insertar-termino
          dt:coeficiente-de dt:eliminar-termino)
 
-;;pruebas exclusivas del datatype (sumasr)
+;;pruebas exclusivas del datatype (sumar)
 (define construir-dt
   (lambda (var pares)
     (cond
