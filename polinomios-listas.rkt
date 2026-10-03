@@ -1,5 +1,5 @@
 #lang eopl
-;Autores: Samuel Peña Jaramillo 202477399 
+;Autores: Samuel Peña Jaramillo 2477399 
 
 ;; Taller 1 — Polinomios dispersos.
 ;; Parte 1: representación basada en listas.
@@ -242,9 +242,10 @@
 
 (define numero->coeficiente
   (lambda (n)
-    (if (integer? n)
-        (coef-ent n)
-        (coef-rac (numerator n) (denominator n)))))
+    (cond
+      [(integer? n) (coef-ent n)]
+      [else
+       (coef-rac (numerator n) (denominator n))])))
 
 ;; coeficiente->numero
 ;; Contrato: coeficiente -> numero-exacto
@@ -252,9 +253,10 @@
 
 (define coeficiente->numero
   (lambda (c)
-    (if (coef-ent? c)
-        (coef-ent->n c)
-        (/ (coef-rac->num c) (coef-rac->den c)))))
+    (cond
+      [(coef-ent? c) (coef-ent->n c)]
+      [else
+       (/ (coef-rac->num c) (coef-rac->den c))])))
 
 ;; aux-insertar-termino
 ;; Contrato: coeficiente x exponente x terminos -> terminos
@@ -262,24 +264,42 @@
 
 (define aux-insertar-termino
   (lambda (coef-nuevo expo-nuevo terminos)
-    (if (sin-terminos? terminos)
-        (mas-terminos (termino coef-nuevo expo-nuevo) (sin-terminos))
-        (let* ((term-actual (mas-terminos->term terminos))
-               (resto (mas-terminos->resto terminos))
-               (coef-actual (termino->coef term-actual))
-               (val-expo-nuevo (expo-nat->k expo-nuevo))
-               (val-expo-actual (expo-nat->k (termino->expo term-actual))))
-          (cond
-            ((> val-expo-nuevo val-expo-actual)
-             (mas-terminos (termino coef-nuevo expo-nuevo) terminos))
-            ((< val-expo-nuevo val-expo-actual)
-             (mas-terminos term-actual (aux-insertar-termino coef-nuevo expo-nuevo resto)))
-            (else
-             (let ((suma (+ (coeficiente->numero coef-nuevo)
-                            (coeficiente->numero coef-actual))))
-               (if (= suma 0)
-                   resto
-                   (mas-terminos (termino (numero->coeficiente suma) expo-nuevo) resto)))))))))
+    (cond
+      ;; si no hay terminos, agregamos el nuevo
+      [(sin-terminos? terminos)
+       (mas-terminos
+        (termino coef-nuevo expo-nuevo)
+        (sin-terminos))]
+      ;; si ya hay terminos, extraemos y comparamos los exponentes
+      [else
+       (let* ((term-actual (mas-terminos->term terminos))
+              (resto (mas-terminos->resto terminos))
+              (coef-actual (termino->coef term-actual))
+              (val-expo-nuevo (expo-nat->k expo-nuevo))
+              (val-expo-actual (expo-nat->k (termino->expo term-actual))))
+         (cond
+           ;; el nuevo termino va antes del actual
+           [(> val-expo-nuevo val-expo-actual)
+            (mas-terminos
+             (termino coef-nuevo expo-nuevo)
+             terminos)]
+           ;; el termino actual se queda y continuamos buscando
+           [(< val-expo-nuevo val-expo-actual)
+            (mas-terminos
+             term-actual
+             (aux-insertar-termino coef-nuevo expo-nuevo resto))]
+           ;; los exponentes son iguales
+           [else
+            (let ((suma (+ (coeficiente->numero coef-nuevo)
+                           (coeficiente->numero coef-actual))))
+              (cond
+                ;; si la suma da cero, el termino desaparece
+                [(= suma 0) resto]
+                ;; en caso de no dar cero, dejamos el termino con la suma
+                [else
+                 (mas-terminos
+                  (termino (numero->coeficiente suma) expo-nuevo)
+                  resto)]))]))])))
 
 ;; aux-coeficiente-de
 ;; Contrato: entero x terminos -> numero-exacto
@@ -287,14 +307,24 @@
 
 (define aux-coeficiente-de
   (lambda (exponente terminos)
-    (if (sin-terminos? terminos)
-        (eopl:error 'coeficiente-de "El polinomio no tiene termino con ese exponente")
-        (let* ((term-actual (mas-terminos->term terminos))
-               (expo-actual (expo-nat->k (termino->expo term-actual))))
-          (cond
-            ((= exponente expo-actual) (coeficiente->numero (termino->coef term-actual)))
-            ((> exponente expo-actual) (eopl:error 'coeficiente-de "El polinomio no tiene termino con ese exponente"))
-            (else (aux-coeficiente-de exponente (mas-terminos->resto terminos))))))))
+    (cond
+      ;; se lanza un error si llegamos al final sin encontrarlo
+      [(sin-terminos? terminos)
+       (eopl:error 'coeficiente-de "El polinomio no tiene termino con ese exponente")]
+      ;; si hay terminos, analizamos el actual
+      [else
+       (let* ((term-actual (mas-terminos->term terminos))
+              (expo-actual (expo-nat->k (termino->expo term-actual))))
+         (cond
+           ;; al encontrar el exponente, retornamos su coeficiente
+           [(= exponente expo-actual)
+            (coeficiente->numero (termino->coef term-actual))]
+           ;; si el exponente buscado es mayor entonces ya no estara por el orden estricto
+           [(> exponente expo-actual)
+            (eopl:error 'coeficiente-de "El polinomio no tiene termino con ese exponente")]
+           ;; en caso de ser menor, seguimos buscando en el resto de la lista
+           [else
+            (aux-coeficiente-de exponente (mas-terminos->resto terminos))]))])))
 
 ;; aux-eliminar-termino
 ;; Contrato: entero x terminos -> terminos
@@ -302,15 +332,27 @@
 
 (define aux-eliminar-termino
   (lambda (exponente terminos)
-    (if (sin-terminos? terminos)
-        (eopl:error 'eliminar-termino "El polinomio no tiene termino con ese exponente")
-        (let* ((term-actual (mas-terminos->term terminos))
-               (resto (mas-terminos->resto terminos))
-               (expo-actual (expo-nat->k (termino->expo term-actual))))
-          (cond
-            ((= exponente expo-actual) resto)
-            ((> exponente expo-actual) (eopl:error 'eliminar-termino "El polinomio no tiene termino con ese exponente"))
-            (else (mas-terminos term-actual (aux-eliminar-termino exponente resto))))))))
+    (cond
+      ;; si llegamos al final sin encontrarlo, se lanza error
+      [(sin-terminos? terminos)
+       (eopl:error 'eliminar-termino "El polinomio no tiene termino con ese exponente")]
+      ;; si hay terminos, analizamos el actual
+      [else
+       (let* ((term-actual (mas-terminos->term terminos))
+              (resto (mas-terminos->resto terminos))
+              (expo-actual (expo-nat->k (termino->expo term-actual))))
+         (cond
+           ;; si encontramos el termino, lo omitimos devolviendo el resto
+           [(= exponente expo-actual)
+            resto]
+           ;; si el exponente buscado es mayor entonces el termino no existe
+           [(> exponente expo-actual)
+            (eopl:error 'eliminar-termino "El polinomio no tiene termino con ese exponente")]
+           ;; en caso del exponente ser menor, preservamos el termino actual y continuamos buscando
+           [else
+            (mas-terminos
+             term-actual
+             (aux-eliminar-termino exponente resto))]))])))
 
 
 ;; Funciones del taller
@@ -332,39 +374,54 @@
 
 (define polinomio-cero
   (lambda (variable)
-    (poli (nombre-var variable) (sin-terminos))))
+    (poli
+     (nombre-var variable)
+     (sin-terminos))))
 
 ;; insertar-termino
 ;; Contrato: polinomio x numero-exacto x entero -> polinomio
-;; Proposito: Insertar un nuevo termino en el polinomio o lo opera con uno existente y lanza error si los datos son invalidos.
+;; Proposito: Insertar un nuevo termino en el polinomio u operarlo con uno existente y lanzar error si los datos son invalidos.
 
 (define insertar-termino
   (lambda (polinomio coeficiente exponente)
-    (if (not (exact? coeficiente))
-        (eopl:error 'insertar-termino "El coeficiente no es un numero exacto")
-        (if (< exponente 0)
-            (eopl:error 'insertar-termino "El exponente debe ser un entero no negativo")
-            (if (= coeficiente 0)
-                polinomio
-                (poli (poli->var polinomio)
-                      (aux-insertar-termino (numero->coeficiente coeficiente)
-                                             (expo-nat exponente)
-                                             (poli->terms polinomio))))))))
+    (cond
+      ;; el coeficiente no es un numero exacto
+      [(not (exact? coeficiente))
+       (eopl:error 'insertar-termino "El coeficiente no es un numero exacto")]
+      ;; el exponente debe ser un entero no negativo
+      [(< exponente 0)
+       (eopl:error 'insertar-termino "El exponente debe ser un entero no negativo")]
+      ;; si el coeficiente es cero, no hacemos ningun cambio
+      [(= coeficiente 0)
+       polinomio]
+      ;; insertamos el termino conservando el orden de los exponentes
+      [else
+       (poli
+        (poli->var polinomio)
+        (aux-insertar-termino
+         (numero->coeficiente coeficiente)
+         (expo-nat exponente)
+         (poli->terms polinomio)))])))
 
 ;; coeficiente-de
 ;; Contrato: polinomio x entero -> numero-exacto
-;; Proposito: Retornar el coeficiente concreto del polinomio correspondiente al exponente dado y lanza error si no existe. 
+;; Proposito: Retornar el coeficiente concreto del polinomio correspondiente al exponente dado y lanzar error si no existe. 
 
 (define coeficiente-de
   (lambda (polinomio exponente)
-    (aux-coeficiente-de exponente (poli->terms polinomio))))
+    (aux-coeficiente-de
+     exponente
+     (poli->terms polinomio))))
 
 ;; eliminar-termino
 ;; Contrato: polinomio x entero -> polinomio
-;; Proposito: Eliminar del polinomio el termino asociado al exponente dado y lanza error si el termino no existe.
+;; Proposito: Eliminar del polinomio el termino asociado al exponente dado y lanzar error si el termino no existe.
 
 (define eliminar-termino
   (lambda (polinomio exponente)
-    (poli (poli->var polinomio)
-          (aux-eliminar-termino exponente (poli->terms polinomio)))))
+    (poli
+     (poli->var polinomio)
+     (aux-eliminar-termino
+      exponente
+      (poli->terms polinomio)))))
 
