@@ -1,16 +1,5 @@
 # Informe de corrección — Taller 1: polinomios dispersos
 
-> **Plantilla de entrega.** Copie este archivo a
-> `docs/informe-correccion.md` dentro del repositorio del grupo y
-> reemplace los marcadores `{{...}}` con su contenido. **No elimine
-> las secciones obligatorias.** No se aceptan PDF, DOCX ni imágenes
-> insertadas: todo el documento debe ser Markdown, las fórmulas en
-> LaTeX (`$...$` / `$$...$$`) y los diagramas, si los hay, en Mermaid.
->
-> Las demostraciones se hacen una sola vez, sobre la estructura
-> recursiva que define la gramática, porque la lógica de las funciones
-> es la misma en las tres representaciones.
-
 **Curso:** Fundamentos de Interpretación y Compilación de Lenguajes
 de Programación — Universidad del Valle, Sede Tuluá.
 
