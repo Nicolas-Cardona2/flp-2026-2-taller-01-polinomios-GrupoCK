@@ -18,11 +18,10 @@ de Programación — Universidad del Valle, Sede Tuluá.
 
 | Nombre | Código | Correo institucional |
 |--------|--------|----------------------|
-| Samuel Peña Jaramillo | 202477399 | {{samuel.pena@correounivalle.edu.co}} |
-| Laura Sofía Echeverry González | 2477067 | {{echeverry.laura@correounivalle.edu.co}} |
-| Santiago Serrano Morales | 202477006 | {{serrano.santiago@correounivalle.edu.co}} |
-| Nicolas Cardona Garcia | 2477349-3743 | {{nicolas.cardona.garcia@correounivalle.edu.co}} |
-|--------|--------|----------------------|
+| Samuel Peña Jaramillo | 202477399 | samuel.pena@correounivalle.edu.co |
+| Laura Sofía Echeverry González | 2477067 | echeverry.laura@correounivalle.edu.co |
+| Santiago Serrano Morales | 202477006 | serrano.santiago@correounivalle.edu.co |
+| Nicolas Cardona Garcia | 2477349-3743 | nicolas.cardona.garcia@correounivalle.edu.co |
 
 ---
 
@@ -35,219 +34,16 @@ recursivamente. Sea $P_f$ un programa recursivo en Racket que pretende
 calcular $f$. Decimos que $P_f$ es correcto con respecto a su
 especificación si se cumple:
 
-$$
-\forall a \in A \,:\, P_f(a) = f(a)
-$$
-
-La estrategia de demostración es **inducción estructural** sobre $A$.
-Aquí $A$ es el conjunto de listas de términos que genera la gramática:
-
-- **Caso base:** $a = \text{sin-terminos}()$, y se verifica
-  $P_f(a) = f(a)$ directamente.
-- **Caso inductivo:** $a = \text{mas-terminos}(t, r)$. Se asume la
-  **hipótesis de inducción** $P_f(r) = f(r)$ sobre el resto de la
-  lista y se demuestra $P_f(a) = f(a)$.
-
-Si alguna de sus funciones quedó escrita con un acumulador en lugar de
-recursión estructural, la corrección se argumenta con una invariante
-del acumulador y no con la hipótesis de inducción: enuncie la
-invariante, demuestre que vale al inicio, que cada paso la conserva y
-que al terminar implica la post-condición.
-
-### 1.2 El invariante de la representación
-
-Las cuatro condiciones del enunciado se enuncian como una única
-propiedad sobre polinomios. Sea $p$ un polinomio con términos
-$t_1, t_2, \ldots, t_n$, donde $t_i = (c_i, e_i)$:
-
-$$
-\mathrm{Inv}(p) \equiv
-\underbrace{\forall i < n : e_i > e_{i+1}}_{\text{orden estricto}}
-\ \land\
-\underbrace{\forall i : c_i \neq 0}_{\text{sin ceros}}
-\ \land\
-\underbrace{\forall i : e_i \in \mathbb{N}}_{\text{exponentes naturales}}
-\ \land\
-\underbrace{\forall i : \mathrm{red}(c_i)}_{\text{racionales reducidos}}
-$$
-
-donde $\mathrm{red}\left(\frac{a}{b}\right)$ abrevia
-$b > 0 \,\land\, \mathrm{mcd}(|a|, b) = 1$, y un coeficiente entero se
-toma como el racional de denominador $1$.
-
-{{Si prefiere escribir el invariante con otra notación, hágalo, pero
-las cuatro condiciones deben quedar todas y de forma que se puedan
-verificar término por término.}}
-
----
-
-## 2. Funciones analizadas
-
-### 2.1 Corrección de `coeficiente-de`
-
-**Especificación.**
-
-- **Tipo:** `coeficiente-de : polinomio × exponente -> coeficiente`
-- **Pre-condición:** $\mathrm{Inv}(p)$ y {{condición sobre el
-  exponente consultado}}.
-- **Post-condición:** $\text{Post}(p, e, r) \equiv {{\ldots}}$ cuando
-  el exponente $e$ aparece en $p$; y la función levanta
-  `eopl:error` cuando no aparece.
-
-**Código.**
-
-```racket
-; coeficiente-de : {{contrato}}
-; Propósito: {{...}}
-(define (coeficiente-de p e)
-  ...)
-```
-
-**Demostración.**
-
-- **Caso base** ($\text{sin-terminos}$): {{qué hace el programa y por
-  qué eso es exactamente levantar el error.}}
-
-  $$
-  {{\ldots}}
-  $$
-
-- **Caso inductivo** ($\text{mas-terminos}(t, r)$): distinga los tres
-  subcasos según la comparación entre el exponente de $t$ y el
-  exponente buscado. {{Uno de ellos usa la hipótesis de inducción
-  sobre $r$; explique por qué el orden estricto del invariante permite
-  cortar la búsqueda sin recorrer el resto de la lista.}}
-
-  $$
-  {{\ldots}}
-  $$
-
-- **Levantamiento del error.** Demuestre que el error se levanta
-  cuando el exponente no está y **solo** en ese caso.
-
-- **Terminación.** {{Medida que decrece estrictamente en cada llamada
-  y cota inferior.}}
-
-**Conclusión:** {{...}}
-
----
-
-### 2.2 Corrección de `eliminar-termino`
-
-**Especificación.**
-
-- **Tipo:** `eliminar-termino : polinomio × exponente -> polinomio`
-- **Pre-condición:** $\mathrm{Inv}(p)$ y {{...}}.
-- **Post-condición:** el resultado contiene **exactamente** los
-  términos de $p$ menos el de exponente $e$. Formalmente:
-  $$
-  \text{terminos}(r) = \text{terminos}(p) \setminus \{{\ldots}\}
-  $$
-  y la función levanta `eopl:error` si $e$ no aparece en $p$.
-
-**Código.**
-
-```racket
-(define (eliminar-termino p e)
-  ...)
-```
-
-**Demostración.** Siga el esquema de 2.1: caso base, caso inductivo
-con hipótesis de inducción, error y terminación. {{Además de la
-igualdad de conjuntos de términos, argumente que el resultado sigue
-cumpliendo $\mathrm{Inv}$: quitar un término no rompe el orden
-estricto ni introduce ceros.}}
-
----
-
-### 2.3 `insertar-termino` preserva el invariante
-
-**Enunciado.** Si $\mathrm{Inv}(p)$ vale antes de la llamada, entonces
-$\mathrm{Inv}(\texttt{insertar-termino}(p, c, e))$ vale sobre el
-resultado.
-
-**Código.**
-
-```racket
-(define (insertar-termino p c e)
-  ...)
-```
-
-**Demostración por casos.** Cubra los tres casos del enunciado y
-verifique en cada uno las cuatro condiciones del invariante:
-
-- **Caso A — el exponente es nuevo.** {{Dónde queda el término
-  insertado y por qué el orden estricto se conserva. Qué pasa si el
-  coeficiente que llega es cero.}}
-
-- **Caso B — el exponente ya existía y la suma no es cero.** {{El
-  término se reemplaza por uno con el coeficiente sumado; el orden no
-  cambia porque el exponente es el mismo. Argumente que el coeficiente
-  resultante queda reducido y con denominador positivo.}}
-
-- **Caso C — el exponente ya existía y la suma es cero.** {{El término
-  desaparece. Argumente que quitarlo conserva el orden estricto y que
-  el resultado no queda con un cero, que es justo lo que exige la
-  segunda condición.}}
-
-**Terminación.** {{...}}
-
-**Conclusión:** {{...}}
-
----
-
-## 3. Equivalencia de las dos representaciones
-
-Argumente por qué las funciones de la interfaz son las mismas para la
-representación basada en listas y la basada en procedimientos, y qué
-propiedad de la interfaz impide que el cliente las distinga. Basta una
-explicación conceptual apoyada en la sección 2.2 de EOPL, sin
-demostración formal.
-
-Conviene que la explicación responda a esto:
-
-- {{Qué ve el cliente de un polinomio: qué operaciones tiene
-  disponibles y qué no puede hacer.}}
-- {{Qué cambia entre las dos representaciones y por qué ese cambio
-  queda del lado de adentro de la interfaz.}}
-- {{Qué habría que hacer para que el cliente sí notara la diferencia,
-  y por qué eso significaría que la abstracción se rompió.}}
-
----
-
-## 4. Referencias
-
-- Friedman, D. P., & Wand, M. *Essentials of Programming Languages*,
-  3.ª ed., MIT Press, 2008. Sección 2.1 (especificación de datos),
-  sección 2.2 (representación basada en listas y basada en
-  procedimientos), sección 2.4 (`define-datatype` y `cases`).
-- {{Otras referencias que hayan consultado.}}
-
----
-
-## 1. Marco formal
-
-### 1.1 Corrección de programas recursivos
-
-Sea $f : A \to B$ una función y $A$ un conjunto definido
-recursivamente. Sea $P_f$ un programa recursivo en Racket que pretende
-calcular $f$. Decimos que $P_f$ es correcto con respecto a su
-especificación si se cumple:
-
-$$
-\forall a \in A \;:\; P_f(a) = f(a)
-$$
+$$ \forall a \in A \;:\; P_f(a) = f(a) $$
 
 La estrategia de demostración es **inducción estructural** sobre $A$.
 
 Aquí $A$ es el conjunto de listas de términos que genera la gramática:
 
-- **Caso base:** $a = \text{sin-terminos}()$, y se verifica
-  $P_f(a) = f(a)$ directamente.
+- **Caso base:** $a = \text{sin-terminos}()$, y se verifica $P_f(a) = f(a)$ directamente.
 
 - **Caso inductivo:** $a = \text{mas-terminos}(t, r)$. Se asume la
-  **hipótesis de inducción** $P_f(r) = f(r)$ sobre el resto de la
-  lista y se demuestra $P_f(a) = f(a)$.
+- **hipótesis de inducción** $P_f(r) = f(r)$ sobre el resto de la lista y se demuestra $P_f(a) = f(a)$.
 
 Si alguna de sus funciones quedó escrita con un acumulador en lugar de
 recursión estructural, la corrección se argumenta con una invariante
@@ -289,9 +85,7 @@ toma como el racional de denominador $1$.
 - **Post-condición:** si el exponente $e$ aparece en $p$, el resultado
   $r$ es el coeficiente asociado a dicho exponente:
 
-  $$
-  r = c \quad \text{si } (c,e) \text{ pertenece a los términos de } p.
-  $$
+  $r = c \text{ si } (c,e) \text{ pertenece a los términos de } p$.
 
   Si el exponente $e$ no aparece en $p$, la función levanta
   `eopl:error`.
@@ -363,9 +157,7 @@ términos.
 
   **Primer subcaso:**
 
-  $$
-  e = \operatorname{expo}(t)
-  $$
+  $e = expo(t)$
 
   El exponente buscado coincide con el exponente del término actual.
   Por lo tanto, el programa ejecuta:
@@ -379,13 +171,11 @@ términos.
 
   **Segundo subcaso:**
 
-  $$
-  e > \operatorname{expo}(t)
-  $$
+   $e > expo(t)$
 
   Por el invariante, los exponentes están ordenados estrictamente de
   mayor a menor. Como los exponentes están ordenados estrictamente de mayor a menor,
-  si \(e > \operatorname{expo}(t)\),
+  si $e > \text{expo}(t)$,
   entonces un término con exponente \(e\) tendría que haber aparecido antes en la lista.
   Como ya se pasó esa posición, \(e\) no puede aparecer en el resto.
 
@@ -396,9 +186,7 @@ términos.
 
   **Tercer subcaso:**
 
-  $$
-  e < \operatorname{expo}(t)
-  $$
+  $e < expo(t)$
 
   El exponente buscado puede encontrarse en el resto de la lista. Por
   esta razón, el programa realiza la llamada recursiva:
@@ -420,7 +208,7 @@ el polinomio.
 Esto puede ocurrir de dos formas. La primera es llegar al caso base
 `sin-terminos`, lo que significa que se recorrieron todos los términos
 sin encontrar el exponente. La segunda ocurre cuando
-$e > \operatorname{expo}(t)$, porque el orden estrictamente decreciente
+$e > \text{expo}(t)$, porque el orden estrictamente decreciente
 permite concluir que el exponente buscado ya quedó atrás y no puede
 aparecer en el resto.
 
@@ -433,9 +221,7 @@ La medida utilizada es la cantidad de términos que quedan por recorrer.
 
 En cada llamada recursiva se pasa de:
 
-$$
-\text{mas-terminos}(t,r)
-$$
+$mas-terminos(t,r)$
 
 a la lista $r$, que contiene un término menos que la lista anterior.
 
@@ -536,9 +322,7 @@ términos.
 
   **Primer subcaso:**
 
-  $$
-  e = \operatorname{expo}(t)
-  $$
+  $e = expo(t)$
 
   El exponente buscado coincide con el exponente del término actual.
 
@@ -556,9 +340,7 @@ términos.
 
   **Segundo subcaso:**
 
-  $$
-  e > \operatorname{expo}(t)
-  $$
+  $e > expo(t)$
 
   Como los exponentes están ordenados estrictamente de mayor a menor,
   si $e$ es mayor que el exponente del término actual, entonces un término
@@ -570,9 +352,7 @@ términos.
 
   **Tercer subcaso:**
 
-  $$
-  e < \operatorname{expo}(t)
-  $$
+  $e < expo(t)$
 
   El exponente buscado puede encontrarse en el resto de la lista. Por
   esta razón, la función realiza la llamada recursiva:
@@ -608,9 +388,7 @@ sin encontrar el exponente.
 
 La segunda ocurre cuando:
 
-$$
-e > \operatorname{expo}(t)
-$$
+$e > expo(t)$
 
 porque el orden estrictamente decreciente permite concluir que el
 exponente buscado tendría que haber aparecido antes y, por lo tanto, no
@@ -625,9 +403,7 @@ La medida utilizada es la cantidad de términos que quedan por recorrer.
 
 En cada llamada recursiva se pasa de:
 
-$$
-\text{mas-terminos}(t,r)
-$$
+$mas-terminos(t,r)$
 
 a la lista $r$, que contiene un término menos que la lista anterior.
 
@@ -770,9 +546,7 @@ Se consideran el caso base y los tres casos indicados por la función.
 
   Si:
 
-  $$
-  e > \operatorname{expo}(t)
-  $$
+  $e > expo(t)$
 
   la función ejecuta:
 
@@ -797,9 +571,7 @@ Se consideran el caso base y los tres casos indicados por la función.
 
   Si:
 
-  $$
-  e < \operatorname{expo}(t)
-  $$
+  $e < expo(t)$
 
   el término actual se conserva y la función continúa buscando en
   `resto`:
@@ -824,13 +596,14 @@ Se consideran el caso base y los tres casos indicados por la función.
 
   ```racket
   (let ((suma (+ (valor-coef termino-actual) coef)))
+  (if (zero? suma)
+      resto
+      (mas-terminos (hacer-termino suma expo-actual) resto)))
   ```
 
   Si:
 
-  $$
-  c_{\text{actual}} + c \neq 0
-  $$
+  $c_{actual} + c \neq 0$
 
   la función crea un nuevo término con el coeficiente resultante:
 
@@ -856,9 +629,7 @@ Se consideran el caso base y los tres casos indicados por la función.
 
   Si los exponentes coinciden y:
 
-  $$
-  c_{\text{actual}} + c = 0
-  $$
+  $c_{actual} + c = 0$
 
   la función ejecuta:
 
@@ -924,7 +695,7 @@ Esto permite que las operaciones principales sobre los polinomios se utilicen de
 
 En la representación con listas, los datos se construyen utilizando listas de Racket. Cada estructura contiene una etiqueta que permite identificar el tipo de dato y los valores que forman parte de él.
 
-Por ejemplo, un polinomio se representa mediante una lista que contiene la etiqueta, la variable y la lista de términos. De manera similar, un término contiene su etiqueta, coeficiente y exponente. :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
+Por ejemplo, un polinomio se representa mediante una lista que contiene la etiqueta, la variable y la lista de términos. De manera similar, un término contiene su etiqueta, coeficiente y exponente.
 
 Los observadores recuperan los valores de estas estructuras utilizando las posiciones correspondientes dentro de la lista, mediante operaciones como `car`, `cadr` y `caddr`.
 
@@ -934,9 +705,9 @@ Por lo tanto, en esta representación la información está almacenada directame
 
 ### Representación con procedimientos
 
-En la representación con procedimientos, cada dato se representa mediante una función. El procedimiento recibe un mensaje y responde con la información correspondiente. El código utiliza mensajes como `'tipo`, `'coef`, `'expo`, `'term` y `'resto` para consultar los datos. :contentReference[oaicite:2]{index=2}
+En la representación con procedimientos, cada dato se representa mediante una función. El procedimiento recibe un mensaje y responde con la información correspondiente. El código utiliza mensajes como `'tipo`, `'coef`, `'expo`, `'term` y `'resto` para consultar los datos.
 
-Por ejemplo, el procedimiento que representa un término puede recibir un mensaje para obtener su coeficiente o su exponente. De la misma manera, el procedimiento que representa un polinomio permite consultar su variable y sus términos. :contentReference[oaicite:3]{index=3} :contentReference[oaicite:4]{index=4}
+Por ejemplo, el procedimiento que representa un término puede recibir un mensaje para obtener su coeficiente o su exponente. De la misma manera, el procedimiento que representa un polinomio permite consultar su variable y sus términos.
 
 En este caso, la información no se obtiene directamente de una estructura de lista, sino mediante la comunicación con el procedimiento a través de los mensajes definidos.
 
@@ -954,7 +725,7 @@ La equivalencia entre ambas representaciones se encuentra en que las dos proporc
 | Interfaz del TAD | La misma | La misma |
 | Operaciones principales | Las mismas | Las mismas |
 
-En ambos casos se mantienen las operaciones `polinomio-cero`, `insertar-termino`, `coeficiente-de` y `eliminar-termino`, con los mismos contratos. :contentReference[oaicite:5]{index=5} :contentReference[oaicite:6]{index=6}
+En ambos casos se mantienen las operaciones `polinomio-cero`, `insertar-termino`, `coeficiente-de` y `eliminar-termino`, con los mismos contratos. 
 
 Por ejemplo, cuando se necesita obtener el coeficiente de un término, la forma de acceder al dato cambia según la representación, pero la operación que utiliza el resto del programa sigue siendo `coeficiente-de`.
 
