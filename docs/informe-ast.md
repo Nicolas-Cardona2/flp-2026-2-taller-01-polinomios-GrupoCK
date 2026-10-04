@@ -6,10 +6,10 @@ Integrantes del grupo:
 
 | Nombre | Código | Correo institucional |
 | --- | --- | --- |
-| Samuel Peña Jaramillo | 202477399 | {{samuel.pena@correounivalle.edu.co}} |
-| Laura Sofía Echeverry González | 2477067 | {{echeverry.laura@correounivalle.edu.co}} |
-| Santiago Serrano Morales | 202477006 | {{serrano.santiago@correounivalle.edu.co}} |
-| Nicolas Cardona Garcia | 2477349-3743 | {{nicolas.cardona.garcia@correounivalle.edu.co}} |
+| Samuel Peña Jaramillo | 202477399 | samuel.pena@correounivalle.edu.co |
+| Laura Sofía Echeverry González | 202477067 | echeverry.laura@correounivalle.edu.co |
+| Santiago Serrano Morales | 202477006 | serrano.santiago@correounivalle.edu.co |
+| Nicolas Cardona Garcia | 202477349 | nicolas.cardona.garcia@correounivalle.edu.co |
 
 ## 1. Gramática considerada
 
