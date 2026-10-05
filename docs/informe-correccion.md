@@ -730,6 +730,23 @@ Por esta razón, cambiar la representación interna no implica cambiar la forma 
 
 ---
 
+### ¿Qué tendría que hacer el cliente para notar la diferencia?
+
+Para notar la diferencia entre las dos representaciones, el cliente tendría
+que acceder directamente a la estructura interna de los datos. Por ejemplo,
+en la representación con listas tendría que conocer cómo están organizadas
+las listas y utilizar operaciones como `car`, `cadr` o `caddr`, mientras que
+en la representación con procedimientos tendría que conocer los mensajes que
+reciben los procedimientos.
+
+Si el cliente necesita hacer esto para utilizar el polinomio, la abstracción
+del TAD se rompe, porque deja de depender únicamente de la interfaz y pasa a
+depender de la representación interna. Por esta razón, mientras el cliente
+utilice solamente las operaciones de la interfaz, puede cambiarse la
+representación sin modificar la forma en que utiliza el TAD.
+
+---
+
 ### Conclusión
 
 Las representaciones con listas y con procedimientos son diferentes internamente, pero pueden proporcionar el mismo comportamiento observable a través de la interfaz del TAD.
