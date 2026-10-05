@@ -571,3 +571,220 @@ si el polinomio no tiene un término con ese exponente, genera el error "El poli
      (eliminar-en-terminos
       (poli->terms polinomio)
       exponente))))
+
+;; ============================================================
+;; Ejemplos de la parte 2: Procedimientos
+;; ============================================================
+
+;; ------------------------------------------------------------
+;; Ejemplos de construcción de polinomios
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: polinomio 8x^6 - 4x^3 + 5
+(define ejemplo-proc-1
+  (poli
+   (nombre-var 'x)
+   (mas-terminos
+    (termino (coef-ent 8) (expo-nat 6))
+    (mas-terminos
+     (termino (coef-ent -4) (expo-nat 3))
+     (mas-terminos
+      (termino (coef-ent 5) (expo-nat 0))
+      (sin-terminos))))))
+
+;; Ejemplo 2: polinomio -2y^8 + 7y^4
+(define ejemplo-proc-2
+  (poli
+   (nombre-var 'y)
+   (mas-terminos
+    (termino (coef-ent -2) (expo-nat 8))
+    (mas-terminos
+     (termino (coef-ent 7) (expo-nat 4))
+     (sin-terminos)))))
+
+;; Ejemplo 3: polinomio 5/6z^7 - 3z^2 + 1
+(define ejemplo-proc-3
+  (poli
+   (nombre-var 'z)
+   (mas-terminos
+    (termino (coef-rac 5 6) (expo-nat 7))
+    (mas-terminos
+     (termino (coef-ent -3) (expo-nat 2))
+     (mas-terminos
+      (termino (coef-ent 1) (expo-nat 0))
+      (sin-terminos))))))
+
+;; Ejemplo 4: polinomio 10w^5 + 3/4w
+(define ejemplo-proc-4
+  (poli
+   (nombre-var 'w)
+   (mas-terminos
+    (termino (coef-ent 10) (expo-nat 5))
+    (mas-terminos
+     (termino (coef-rac 3 4) (expo-nat 1))
+     (sin-terminos)))))
+
+;; Ejemplo 5: polinomio -9t^9 + 2t^5 - 6
+(define ejemplo-proc-5
+  (poli
+   (nombre-var 't)
+   (mas-terminos
+    (termino (coef-ent -9) (expo-nat 9))
+    (mas-terminos
+     (termino (coef-ent 2) (expo-nat 5))
+     (mas-terminos
+      (termino (coef-ent -6) (expo-nat 0))
+      (sin-terminos))))))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de polinomio-cero
+;; ------------------------------------------------------------
+
+;; Ejemplo 1
+(define cero-proc-1
+  (polinomio-cero 'c))
+
+;; Ejemplo 2
+(define cero-proc-2
+  (polinomio-cero 'd))
+
+;; Ejemplo 3
+(define cero-proc-3
+  (polinomio-cero 'h))
+
+;; Ejemplo 4
+(define cero-proc-4
+  (polinomio-cero 'n))
+
+;; Ejemplo 5
+(define cero-proc-5
+  (polinomio-cero 'v))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de insertar-termino
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: insertar el primer término
+(define insertar-proc-1
+  (insertar-termino
+   (polinomio-cero 'k)
+   15
+   4))
+
+;; Ejemplo 2: insertar un término con mayor exponente
+(define insertar-proc-2
+  (insertar-termino
+   insertar-proc-1
+   -2
+   8))
+
+;; Ejemplo 3: insertar un término con menor exponente
+(define insertar-proc-3
+  (insertar-termino
+   insertar-proc-2
+   11
+   1))
+
+;; Ejemplo 4: combinar un término con el mismo exponente
+(define insertar-proc-4
+  (insertar-termino
+   insertar-proc-3
+   -5
+   4))
+
+;; Ejemplo 5: insertar coeficiente cero
+;; El polinomio debe permanecer sin cambios.
+(define insertar-proc-5
+  (insertar-termino
+   insertar-proc-4
+   0
+   12))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de coeficiente-de
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: consultar el coeficiente de x^8
+(define coeficiente-proc-1
+  (coeficiente-de
+   insertar-proc-2
+   8))
+
+;; Ejemplo 2: consultar el coeficiente de x^4 después de combinar
+(define coeficiente-proc-2
+  (coeficiente-de
+   insertar-proc-4
+   4))
+
+;; Ejemplo 3: consultar el coeficiente de x^1
+(define coeficiente-proc-3
+  (coeficiente-de
+   insertar-proc-4
+   1))
+
+;; Ejemplo 4: consultar el coeficiente de z^7
+(define coeficiente-proc-4
+  (coeficiente-de
+   ejemplo-proc-3
+   7))
+
+;; Ejemplo 5: consultar el término independiente de t
+(define coeficiente-proc-5
+  (coeficiente-de
+   ejemplo-proc-5
+   0))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de eliminar-termino
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: eliminar el término de mayor exponente
+(define eliminar-proc-1
+  (eliminar-termino
+   insertar-proc-2
+   8))
+
+;; Ejemplo 2: eliminar el término combinado
+(define eliminar-proc-2
+  (eliminar-termino
+   insertar-proc-4
+   4))
+
+;; Ejemplo 3: eliminar el término de menor exponente
+(define eliminar-proc-3
+  (eliminar-termino
+   insertar-proc-4
+   1))
+
+;; Ejemplo 4: eliminar el término independiente
+(define eliminar-proc-4
+  (eliminar-termino
+   ejemplo-proc-5
+   0))
+
+;; Ejemplo 5: eliminar un término intermedio
+(define eliminar-proc-5
+  (eliminar-termino
+   ejemplo-proc-3
+   2))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de error
+;; ------------------------------------------------------------
+
+;; Exponente negativo:
+;; (insertar-termino (polinomio-cero 'j) 6 -3)
+
+;; Coeficiente no exacto:
+;; (insertar-termino (polinomio-cero 'j) 1.5 4)
+
+;; Exponente que no existe:
+;; (coeficiente-de ejemplo-proc-1 10)
+
+;; Intentar eliminar un exponente inexistente:
+;; (eliminar-termino ejemplo-proc-5 7)

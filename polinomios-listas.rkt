@@ -14,7 +14,7 @@
 ;;   eliminar-termino  : polinomio x exponente -> polinomio
 
 
-;; Constructores y observadores
+;; Los constructores y observadores
 
 ;; poli
 ;; Contrato: variable x terminos -> polinomio
@@ -233,7 +233,7 @@
     (cadr e)))
 
 
-;; Funciones auxiliares
+;; Aqui las funciones auxiliares
 
 
 ;; numero->coeficiente
@@ -355,7 +355,7 @@
              (aux-eliminar-termino exponente resto))]))])))
 
 
-;; Funciones del taller
+;; Las funciones del taller
 
 
 (provide polinomio-cero insertar-termino coeficiente-de eliminar-termino
@@ -424,4 +424,221 @@
      (aux-eliminar-termino
       exponente
       (poli->terms polinomio)))))
+
+;; ============================================================
+;; Ejemplos de la parte 1: Listas
+;; ============================================================
+
+;; ------------------------------------------------------------
+;; Ejemplos de construcción de polinomios
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: polinomio 6x^4 - 3x^2 + 8
+(define ejemplo-construccion-1
+  (poli
+   (nombre-var 'x)
+   (mas-terminos
+    (termino (coef-ent 6) (expo-nat 4))
+    (mas-terminos
+     (termino (coef-ent -3) (expo-nat 2))
+     (mas-terminos
+      (termino (coef-ent 8) (expo-nat 0))
+      (sin-terminos))))))
+
+;; Ejemplo 2: polinomio 5y^7 + 2y^3 - 9
+(define ejemplo-construccion-2
+  (poli
+   (nombre-var 'y)
+   (mas-terminos
+    (termino (coef-ent 5) (expo-nat 7))
+    (mas-terminos
+     (termino (coef-ent 2) (expo-nat 3))
+     (mas-terminos
+      (termino (coef-ent -9) (expo-nat 0))
+      (sin-terminos))))))
+
+;; Ejemplo 3: polinomio 3/5z^6 - 4z^2
+(define ejemplo-construccion-3
+  (poli
+   (nombre-var 'z)
+   (mas-terminos
+    (termino (coef-rac 3 5) (expo-nat 6))
+    (mas-terminos
+     (termino (coef-ent -4) (expo-nat 2))
+     (sin-terminos)))))
+
+;; Ejemplo 4: polinomio -7w^5 + 1/2w^3 + 11
+(define ejemplo-construccion-4
+  (poli
+   (nombre-var 'w)
+   (mas-terminos
+    (termino (coef-ent -7) (expo-nat 5))
+    (mas-terminos
+     (termino (coef-rac 1 2) (expo-nat 3))
+     (mas-terminos
+      (termino (coef-ent 11) (expo-nat 0))
+      (sin-terminos))))))
+
+;; Ejemplo 5: polinomio 9t^8 - 6t
+(define ejemplo-construccion-5
+  (poli
+   (nombre-var 't)
+   (mas-terminos
+    (termino (coef-ent 9) (expo-nat 8))
+    (mas-terminos
+     (termino (coef-ent -6) (expo-nat 1))
+     (sin-terminos)))))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de polinomio-cero
+;; ------------------------------------------------------------
+
+;; Ejemplo 1
+(define cero-ejemplo-1
+  (polinomio-cero 'a))
+
+;; Ejemplo 2
+(define cero-ejemplo-2
+  (polinomio-cero 'b))
+
+;; Ejemplo 3
+(define cero-ejemplo-3
+  (polinomio-cero 'm))
+
+;; Ejemplo 4
+(define cero-ejemplo-4
+  (polinomio-cero 'p))
+
+;; Ejemplo 5
+(define cero-ejemplo-5
+  (polinomio-cero 'q))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de insertar-termino
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: insertar un término en el polinomio cero
+(define insertar-ejemplo-1
+  (insertar-termino
+   (polinomio-cero 'r)
+   12
+   6))
+
+;; Ejemplo 2: agregar un término con mayor exponente
+(define insertar-ejemplo-2
+  (insertar-termino
+   insertar-ejemplo-1
+   -5
+   9))
+
+;; Ejemplo 3: agregar un término con menor exponente
+(define insertar-ejemplo-3
+  (insertar-termino
+   insertar-ejemplo-2
+   7
+   2))
+
+;; Ejemplo 4: combinar términos con el mismo exponente
+(define insertar-ejemplo-4
+  (insertar-termino
+   insertar-ejemplo-3
+   3
+   6))
+
+;; Ejemplo 5: insertar un coeficiente cero
+;; El polinomio debe permanecer sin cambios.
+(define insertar-ejemplo-5
+  (insertar-termino
+   insertar-ejemplo-4
+   0
+   15))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de coeficiente-de
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: consultar el coeficiente de x^9
+(define coeficiente-ejemplo-1
+  (coeficiente-de
+   insertar-ejemplo-2
+   9))
+
+;; Ejemplo 2: consultar el coeficiente de x^6
+(define coeficiente-ejemplo-2
+  (coeficiente-de
+   insertar-ejemplo-4
+   6))
+
+;; Ejemplo 3: consultar el coeficiente de x^2
+(define coeficiente-ejemplo-3
+  (coeficiente-de
+   insertar-ejemplo-4
+   2))
+
+;; Ejemplo 4: consultar el coeficiente de x^0
+(define coeficiente-ejemplo-4
+  (coeficiente-de
+   ejemplo-construccion-1
+   0))
+
+;; Ejemplo 5: consultar el coeficiente de y^3
+(define coeficiente-ejemplo-5
+  (coeficiente-de
+   ejemplo-construccion-2
+   3))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de eliminar-termino
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: eliminar el término de mayor exponente
+(define eliminar-ejemplo-1
+  (eliminar-termino
+   insertar-ejemplo-2
+   9))
+
+;; Ejemplo 2: eliminar un término del medio
+(define eliminar-ejemplo-2
+  (eliminar-termino
+   ejemplo-construccion-1
+   2))
+
+;; Ejemplo 3: eliminar el término independiente
+(define eliminar-ejemplo-3
+  (eliminar-termino
+   ejemplo-construccion-2
+   0))
+
+;; Ejemplo 4: eliminar el término de menor exponente
+(define eliminar-ejemplo-4
+  (eliminar-termino
+   ejemplo-construccion-5
+   1))
+
+;; Ejemplo 5: eliminar el único término de un polinomio
+(define eliminar-ejemplo-5
+  (eliminar-termino
+   insertar-ejemplo-1
+   6))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de error
+;; ------------------------------------------------------------
+
+;; Exponente negativo:
+;; (insertar-termino (polinomio-cero 's) 4 -2)
+
+;; Coeficiente no exacto:
+;; (insertar-termino (polinomio-cero 's) 2.5 3)
+
+;; Exponente que no existe:
+;; (coeficiente-de ejemplo-construccion-1 10)
+
+;; Intentar eliminar un exponente inexistente:
+;; (eliminar-termino ejemplo-construccion-5 12)
 

@@ -17,7 +17,7 @@
 
 ;;Interfaz
 
-;;Datatypes 
+;;Los Datatypes 
 
 (define-datatype variable variable?
   (nombre-var
@@ -209,7 +209,7 @@
                                                 (hacer-termino suma expo1)
                                                 (sumar-terminos rest1 rest2))))]))))))))
       
-;; Area del Programador -  Funciones del Taller
+;; Area del Programador -  Las funciones del Taller
 
 ;;(provide polinomio-cero insertar-termino coeficiente-de eliminar-termino sumar)
 (provide polinomio-cero insertar-termino coeficiente-de eliminar-termino sumar nombre-var sin-terminos mas-terminos termino coef-ent coef-rac expo-nat poli)
@@ -286,3 +286,220 @@
                           [(not (eqv? x1 x2)) (eopl:error 'sumar "Los polinomios deben estar en la misma variable")]
                           [else (poli var1 (sumar-terminos terms1 terms2))])))))))))))
 
+;; ============================================================
+;; Ejemplos de la parte 3: Datatypes
+;; ============================================================
+
+;; ------------------------------------------------------------
+;; Ejemplos de construcción con los datatypes
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: construcción de una variable
+(define dato-1
+  (nombre-var 'u))
+
+;; Ejemplo 2: construcción de un coeficiente entero
+(define dato-2
+  (coef-ent -11))
+
+;; Ejemplo 3: construcción de un coeficiente racional
+(define dato-3
+  (coef-rac 7 9))
+
+;; Ejemplo 4: construcción de un término
+(define dato-4
+  (termino
+   (coef-ent 13)
+   (expo-nat 5)))
+
+;; Ejemplo 5: construcción completa de un polinomio
+;; 4v^6 - 2v^3 + 9
+(define dato-5
+  (poli
+   (nombre-var 'v)
+   (mas-terminos
+    (termino (coef-ent 4) (expo-nat 6))
+    (mas-terminos
+     (termino (coef-ent -2) (expo-nat 3))
+     (mas-terminos
+      (termino (coef-ent 9) (expo-nat 0))
+      (sin-terminos))))))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de polinomio-cero
+;; ------------------------------------------------------------
+
+;; Ejemplo 1
+(define cero-dato-1
+  (polinomio-cero 'r))
+
+;; Ejemplo 2
+(define cero-dato-2
+  (polinomio-cero 's))
+
+;; Ejemplo 3
+(define cero-dato-3
+  (polinomio-cero 'z))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de insertar-termino
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: insertar un término en un polinomio vacío
+(define insertar-dato-1
+  (insertar-termino
+   (polinomio-cero 'g)
+   14
+   7))
+
+;; Ejemplo 2: insertar un término con un exponente menor
+(define insertar-dato-2
+  (insertar-termino
+   insertar-dato-1
+   -6
+   3))
+
+;; Ejemplo 3: insertar otro término con el mismo exponente
+;; para comprobar la suma de coeficientes.
+(define insertar-dato-3
+  (insertar-termino
+   insertar-dato-2
+   2
+   3))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de coeficiente-de
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: consultar el coeficiente del término de mayor grado
+(define coeficiente-dato-1
+  (coeficiente-de
+   insertar-dato-3
+   7))
+
+;; Ejemplo 2: consultar el coeficiente del término combinado
+(define coeficiente-dato-2
+  (coeficiente-de
+   insertar-dato-3
+   3))
+
+;; Ejemplo 3: consultar un término independiente
+(define coeficiente-dato-3
+  (coeficiente-de
+   dato-5
+   0))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de eliminar-termino
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: eliminar el término de mayor exponente
+(define eliminar-dato-1
+  (eliminar-termino
+   insertar-dato-3
+   7))
+
+;; Ejemplo 2: eliminar el término combinado
+(define eliminar-dato-2
+  (eliminar-termino
+   insertar-dato-3
+   3))
+
+;; Ejemplo 3: eliminar el término independiente
+(define eliminar-dato-3
+  (eliminar-termino
+   dato-5
+   0))
+
+
+;; ------------------------------------------------------------
+;; Ejemplos de sumar
+;; ------------------------------------------------------------
+
+;; Ejemplo 1: suma de dos polinomios con exponentes diferentes
+;; p = 6a^5 + 3a^2
+;; q = 4a^3 + 8
+;; resultado = 6a^5 + 4a^3 + 3a^2 + 8
+(define suma-dato-1
+  (sumar
+   (poli
+    (nombre-var 'a)
+    (mas-terminos
+     (termino (coef-ent 6) (expo-nat 5))
+     (mas-terminos
+      (termino (coef-ent 3) (expo-nat 2))
+      (sin-terminos))))
+   (poli
+    (nombre-var 'a)
+    (mas-terminos
+     (termino (coef-ent 4) (expo-nat 3))
+     (mas-terminos
+      (termino (coef-ent 8) (expo-nat 0))
+      (sin-terminos))))))
+
+;; Ejemplo 2: suma de términos con el mismo exponente
+;; p = 9b^4 - 2b
+;; q = -9b^4 + 5b
+;; resultado = 3b
+(define suma-dato-2
+  (sumar
+   (poli
+    (nombre-var 'b)
+    (mas-terminos
+     (termino (coef-ent 9) (expo-nat 4))
+     (mas-terminos
+      (termino (coef-ent -2) (expo-nat 1))
+      (sin-terminos))))
+   (poli
+    (nombre-var 'b)
+    (mas-terminos
+     (termino (coef-ent -9) (expo-nat 4))
+     (mas-terminos
+      (termino (coef-ent 5) (expo-nat 1))
+      (sin-terminos))))))
+
+;; Ejemplo 3: suma con coeficientes racionales
+;; p = 2/3c^6 + c^2
+;; q = 1/3c^6 - 4
+;; resultado = c^6 + c^2 - 4
+(define suma-dato-3
+  (sumar
+   (poli
+    (nombre-var 'c)
+    (mas-terminos
+     (termino (coef-rac 2 3) (expo-nat 6))
+     (mas-terminos
+      (termino (coef-ent 1) (expo-nat 2))
+      (sin-terminos))))
+   (poli
+    (nombre-var 'c)
+    (mas-terminos
+     (termino (coef-rac 1 3) (expo-nat 6))
+     (mas-terminos
+      (termino (coef-ent -4) (expo-nat 0))
+      (sin-terminos))))))
+
+;; ------------------------------------------------------------
+;; Ejemplos de error -- Adicionales a los solicitados 
+;; ------------------------------------------------------------
+
+;; Error 1: intentar insertar un exponente negativo
+;; (insertar-termino (polinomio-cero 'd) 5 -2)
+
+;; Error 2: intentar insertar un coeficiente decimal
+;; (insertar-termino (polinomio-cero 'e) 2.5 4)
+
+;; Error 3: consultar un exponente que no existe
+;; (coeficiente-de dato-5 10)
+
+;; Error 4: eliminar un exponente que no existe
+;; (eliminar-termino dato-5 8)
+
+;; Error 5: intentar sumar polinomios de variables diferentes
+;; (sumar
+;;  (polinomio-cero 'x)
+;;  (polinomio-cero 'y))
